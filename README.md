@@ -55,3 +55,4 @@ This project is [MIT](https://github.com/skittleson/GcodeController/blob/master/
 ## References 
  - https://www.codeproject.com/tips/1031689/speaking-asp-net-website
  - https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio
+ - https://www.tenforums.com/tutorials/132456-add-remove-speech-voices-windows-10-a.html#:~:text=1%20Open%20Settings%2C%20and%20click%2Ftap%20on%20the%20Time,and%20click%2Ftap%20on%20Add.%20...%20More%20items...%20

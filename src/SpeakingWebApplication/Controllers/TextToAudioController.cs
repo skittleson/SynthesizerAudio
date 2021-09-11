@@ -13,7 +13,6 @@ namespace SpeakingWebApplication.Controllers
         public async Task<FileStreamResult> Get([FromQuery] string text)
         {
             var synthesizerAudioFactory = new SynthesizerAudioFactory();
-            // todo check content type request;
             var audio = await synthesizerAudioFactory.TextToSpeechAudioAsync(text, SynthesizerAudioFactory.AUDIO_FORMAT.MP3);
             return new FileStreamResult(audio, Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("audio/mpeg"));
         }

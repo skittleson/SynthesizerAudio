@@ -9,10 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpeakingWebApplicationTests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{72AA2E87-D652-4DD6-9404-31EF43006951}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\LICENSE = ..\..\LICENSE
 		..\..\README.md = ..\..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Speech.Logic", "..\Speech.Logic\Speech.Logic.csproj", "{45FFA199-06AB-4FB3-AD1B-376D174A7A0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Speech.Logic", "..\Speech.Logic\Speech.Logic.csproj", "{45FFA199-06AB-4FB3-AD1B-376D174A7A0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
