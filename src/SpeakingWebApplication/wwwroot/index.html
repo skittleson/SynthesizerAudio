@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Speaking Web Application</title>
+</head>
+<body>
+
+
+    <label for="inputText">Type it!</label><br />
+    <textarea id="inputText" class="form-control"
+              rows="5" style="width:100%;"></textarea><br />
+    <button id="playAudio" type="button"
+            class="btn btn-primary btn-lg btn-block">
+        Say it!
+    </button>
+
+    <audio controls>
+        <source src="/api/texttoaudio?text=hello%world" type="audio/mpeg">
+        <source src="/api/texttoaudio?text=hello%world" type="audio/ogg">
+        <p>
+            Your browser doesn't support HTML5 audio. Here is
+            a <a href="/api/texttoaudio?text=hello%world">link to the audio</a> instead.
+        </p>
+    </audio>
+</body>
+</html>

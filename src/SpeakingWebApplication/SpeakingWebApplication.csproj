@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <RepositoryUrl>https://github.com/skittleson/SpeakingWebApp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>mp3,ogg-vorbis,webapi, texttospeech, csharp</PackageTags>
+    <Authors>Spencer Kittleson</Authors>
+    <Company>Do Code That Matters</Company>
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Speech.Logic\Speech.Logic.csproj" />
+  </ItemGroup>
+
+
+
+
+</Project>
