@@ -50,5 +50,14 @@ namespace SpeakingWebApplicationTests
             await System.IO.File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
         }
 
+        [Fact]
+        public void Can_get_voices()
+        {
+
+            var voices = service.GetVoiceNames();
+            Assert.True(voices.Length > 2);
+
+        }
+
     }
 }

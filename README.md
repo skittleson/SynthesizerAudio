@@ -9,6 +9,16 @@
 
 Download the latest and run
 
+```csharp
+ [HttpGet]
+    public async Task<FileStreamResult> Get([FromQuery] string text)
+    {
+        var synthesizerAudioFactory = new SynthesizerAudioFactory();
+        var audio = await synthesizerAudioFactory.TextToSpeechAudioAsync(text, SynthesizerAudioFactory.AUDIO_FORMAT.MP3);
+        return new FileStreamResult(audio, Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("audio/mpeg"));
+    }
+```
+
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome.<br />
