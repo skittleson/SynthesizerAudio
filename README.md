@@ -22,7 +22,7 @@ Download the latest and run
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome.<br />
-Feel free to check [issues page](https://github.com/skittleson/GcodeController/issues) if you want to contribute.<br />
+Feel free to check [issues page](https://github.com/skittleson/SpeakingWebApp/issues) if you want to contribute.<br />
 
 ## Author
 
