@@ -11,7 +11,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Speech.Logic\Speech.Logic.csproj" />
+    <ProjectReference Include="..\..\SynthesizerAudio\SynthesizerAudio.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 

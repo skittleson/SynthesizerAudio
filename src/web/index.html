@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Speaking Web Application</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/picnic">
+</head>
+<body>
+    <div style="overflow: hidden;height: 50px;">
+        <nav class="demo">
+            <a href="#" class="brand">
+                <span>Speaking Web App</span>
+            </a>
+            <input id="bmenub" type="checkbox" class="show">
+            <label for="bmenub" class="burger pseudo button">menu</label>
+            <div class="menu">
+                <a href="https://github.com/skittleson/SpeakingWebApp" class="button icon-puzzle">Documentation</a>
+            </div>
+        </nav>
+
+    </div>
+
+    <div style="margin:1%;">
+        <textarea id="inputText" class="form-control"
+                  rows="5" style="width:100%;" placeholder="Type anything you would like to be echoed back."></textarea><br />
+        <button id="playAudio" type="button"
+                class="btn btn-primary btn-lg btn-block">
+            Say it!
+        </button>
+        <br />
+        <audio controls>
+            <source src="/api/texttoaudio.mp3?text=hello%20world" type="audio/mpeg">
+            <source src="/api/texttoaudio.ogg?text=hello%20world" type="audio/ogg">
+            <p>
+                Your browser doesn't support HTML5 audio. Here is
+                a <a href="/api/texttoaudio?text=hello%world">link to the audio</a> instead.
+            </p>
+        </audio>
+
+    </div>
+
+</body>
+</html>

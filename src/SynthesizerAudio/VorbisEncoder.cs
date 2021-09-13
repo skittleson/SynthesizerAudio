@@ -2,12 +2,24 @@
 using System;
 using System.IO;
 
-// https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder/blob/2ee366a2c6a92f095e0cfdaf0ae5d047fdb1cc35/OggVorbisEncoder.Example/Encoder.cs#L48
-namespace Speech.Logic
+//All Credits - https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder/blob/2ee366a2c6a92f095e0cfdaf0ae5d047fdb1cc35/OggVorbisEncoder.Example/Encoder.cs#L48
+namespace SynthesizerAudio
 {
-    public static class VorbisEncoder
+
+    public interface IVorbisEncoder
+    {
+        void ConvertWavToOgg(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount);
+    }
+
+    public class VorbisEncoder : IVorbisEncoder
     {
         private static readonly int WriteBufferSize = 512;
+
+        public VorbisEncoder() { }
+        public static IVorbisEncoder New() => new VorbisEncoder();
+
+        public void ConvertWavToOgg(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount)
+            => ConvertPCMFile(source, destination, samplesPerSecond, channelCount);
 
         public static void ConvertPCMFile(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount)
         {

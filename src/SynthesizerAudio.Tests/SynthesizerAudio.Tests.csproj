@@ -22,8 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SpeakingWebApplication\SpeakingWebApplication.csproj" />
-    <ProjectReference Include="..\Speech.Logic\Speech.Logic.csproj" />
+    <ProjectReference Include="..\SynthesizerAudio\SynthesizerAudio.csproj" />
   </ItemGroup>
 
 </Project>

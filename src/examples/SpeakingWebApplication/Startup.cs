@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using System.IO;
 
 namespace SpeakingWebApplication
 {
@@ -33,7 +35,12 @@ namespace SpeakingWebApplication
 
             app.UseRouting();
 
-            app.UseFileServer();
+            var webDirectory = Path.Combine(Directory.GetParent(Directory.GetParent(env.ContentRootPath).FullName).FullName, "web");
+            app.UseFileServer(new FileServerOptions
+            {
+                FileProvider = new PhysicalFileProvider(webDirectory),
+                RequestPath = "",
+            });
 
             app.UseAuthorization();
 
