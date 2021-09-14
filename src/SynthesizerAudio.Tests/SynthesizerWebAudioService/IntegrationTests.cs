@@ -4,13 +4,13 @@ using Xunit;
 
 namespace SynthesizerAudio.Tests
 {
-    public class SynthesizerWebAudioServiceTests
+    public class IntegrationTests
     {
         private readonly SynthesizerWebAudioService service;
 
-        public SynthesizerWebAudioServiceTests()
+        public IntegrationTests()
         {
-            service = new SynthesizerWebAudioService(VorbisEncoder.New());
+            service = new SynthesizerWebAudioService();
         }
 
 
@@ -49,14 +49,14 @@ namespace SynthesizerAudio.Tests
             await System.IO.File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
         }
 
-        [Fact]
-        public void Can_get_voices()
-        {
+        //[Fact]
+        //public void Can_get_voices()
+        //{
 
-            var voices = service.GetVoiceNames();
-            Assert.True(voices.Length > 2);
+        //    var voices = service.GetVoiceNames();
+        //    Assert.True(voices.Length > 2);
 
-        }
+        //}
 
     }
 }

@@ -1,6 +1,4 @@
-﻿using NAudio.Lame;
-using NAudio.Wave;
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,22 +10,33 @@ using System.Web;
 
 namespace SynthesizerAudio
 {
-    public class SynthesizerWebAudioService : IDisposable
+    public class SynthesizerWebAudioService
     {
         //--- Private Properties ---
         private IVorbisEncoder VorbisEncoder { get; }
-        private SpeechSynthesizer SpeechSynthesizer { get; }
+        private IMp3Encoder Mp3Encoder { get; }
+        private ISpeechSynthesizerFactory SpeechSynthesizerFactory { get; }
 
 
         /// <summary>
         /// Text to speech synthesizer for web audio
         /// </summary>
         /// <param name="vorbisEncoder">Vorbis encoder</param>
-        public SynthesizerWebAudioService(IVorbisEncoder vorbisEncoder)
+        public SynthesizerWebAudioService(IVorbisEncoder vorbisEncoder, IMp3Encoder mp3Encoder, ISpeechSynthesizerFactory speechSynthesizerFactory)
         {
-            VorbisEncoder = vorbisEncoder;
-            SpeechSynthesizer = new SpeechSynthesizer();
+
+            VorbisEncoder = vorbisEncoder ?? throw new ArgumentNullException("Vorbis Encoder Required");
+            Mp3Encoder = mp3Encoder ?? throw new ArgumentNullException("Mp3 Encoder Required");
+            SpeechSynthesizerFactory = speechSynthesizerFactory ?? throw new ArgumentNullException("Speech Synthesizer Required");
         }
+
+        public SynthesizerWebAudioService()
+        {
+            SpeechSynthesizerFactory ??= new SpeechSynthesizerFactory();
+            VorbisEncoder ??= new VorbisEncoder();
+            Mp3Encoder ??= new Mp3Encoder();
+        }
+
         public enum AUDIO_FORMAT
         {
             WAV = 0,
@@ -35,13 +44,13 @@ namespace SynthesizerAudio
             OGG = 4
         }
 
-        public string[] GetVoiceNames()
-        {
-            return SpeechSynthesizer
-                .GetInstalledVoices()
-                .Select(x => x.VoiceInfo.Name)
-                .ToArray();
-        }
+        //public string[] GetVoiceNames()
+        //{
+        //    return SpeechSynthesizer
+        //        .GetInstalledVoices()
+        //        .Select(x => x.VoiceInfo.Name)
+        //        .ToArray();
+        //}
 
         public async Task<MemoryStream> TextToSpeechAudioAsync(string text, AUDIO_FORMAT format)
         {
@@ -52,46 +61,23 @@ namespace SynthesizerAudio
 
             // Speech format: https://docs.microsoft.com/en-us/dotnet/api/system.speech.audioformat?view=netframework-4.8
             var speechAudioFormatConfig = new SpeechAudioFormatInfo(
-                samplesPerSecond: 8000,
+                samplesPerSecond: 16000,
                 bitsPerSample: AudioBitsPerSample.Sixteen,
                 channel: AudioChannel.Stereo);
 
-            // NAudio wave format has to be the same as speech audio format
-            var waveFormat = new WaveFormat(
-                rate: speechAudioFormatConfig.SamplesPerSecond,
-                bits: speechAudioFormatConfig.BitsPerSample,
-                channels: speechAudioFormatConfig.ChannelCount);
-
-            // Slow down the voice: https://docs.microsoft.com/en-us/dotnet/api/system.speech.synthesis.promptbuilder?view=netframework-4.8
-            var prompt = new PromptBuilder { Culture = CultureInfo.CreateSpecificCulture("en-US") };
-            prompt.StartVoice(prompt.Culture);
-            prompt.StartSentence();
-            prompt.StartStyle(new PromptStyle() { Emphasis = PromptEmphasis.Reduced, Rate = PromptRate.Slow });
-            prompt.AppendText(text);
-            prompt.EndStyle();
-            prompt.EndSentence();
-            prompt.EndVoice();
-
-            // Setup speech synthesizer to stream
-            using var speechSynthesizerStream = new MemoryStream();
-            SpeechSynthesizer.SetOutputToAudioStream(
-                audioDestination: speechSynthesizerStream,
-                formatInfo: speechAudioFormatConfig);
-
-            // Synthesize text to a wav stream
-            await Task.Run(() => SpeechSynthesizer.Speak(prompt), cancellationToken.Token);
-            speechSynthesizerStream.Position = 0;
-            var bitRate = (speechAudioFormatConfig.AverageBytesPerSecond * 8);
+            var speechSynthesizerStream = await SpeechSynthesizerFactory.GetStreamAsync(text, speechAudioFormatConfig);
 
             // Convert wav stream to mp3 or ogg
             switch (format)
             {
                 case AUDIO_FORMAT.MP3:
-                    using (var mp3StreamWriter = new LameMP3FileWriter(outStream: audioStream, format: waveFormat, bitRate: bitRate))
-                        await speechSynthesizerStream.CopyToAsync(mp3StreamWriter, cancellationToken.Token);
+                    await Mp3Encoder.EncodeAsync(
+                        speechSynthesizerStream,
+                        audioStream,
+                        speechAudioFormatConfig);
                     break;
                 case AUDIO_FORMAT.OGG:
-                    VorbisEncoder.ConvertWavToOgg(
+                    VorbisEncoder.Encode(
                         speechSynthesizerStream,
                         audioStream,
                         speechAudioFormatConfig.SamplesPerSecond,
@@ -107,22 +93,21 @@ namespace SynthesizerAudio
             return audioStream;
         }
 
-        public async Task<SynthesizerWebAudioResponse> HandleRequest(Uri requestedUrl)
+        public async Task<SynthesizerWebAudioResponse> HandleRequestAsync(Uri requestedUrl)
         {
-            var text = HttpUtility.ParseQueryString(requestedUrl.Query)["text"];
-            if (string.IsNullOrEmpty(text))
-            {
-                var queryCollection = HttpUtility.ParseQueryString(requestedUrl.Query);
-                text = queryCollection["text"];
-            }
+            var queryParams = HttpUtility.ParseQueryString(requestedUrl.Query);
+            var text = queryParams["text"];
+            var type = (queryParams["type"] ?? "").Trim().ToLower();
             var format = AUDIO_FORMAT.MP3;
-            var ext = Path.GetExtension(requestedUrl.LocalPath).ToLower();
-            switch (ext)
+            switch (type)
             {
-                case ".ogg":
+                case "ogg":
                     format = AUDIO_FORMAT.OGG;
                     break;
-                case ".wav":
+                case "mp3":
+                    format = AUDIO_FORMAT.MP3;
+                    break;
+                case "wav":
                     format = AUDIO_FORMAT.WAV;
                     break;
             }
@@ -135,11 +120,14 @@ namespace SynthesizerAudio
             {
                 throw new MissingParameters("text");
             }
-            var contentType = "audio/wav";
+            var contentType = "audio/mp3";
             switch (format)
             {
                 case AUDIO_FORMAT.OGG:
                     contentType = "audio/ogg";
+                    break;
+                case AUDIO_FORMAT.MP3:
+                    contentType = "audio/mp3";
                     break;
                 case AUDIO_FORMAT.WAV:
                     contentType = "audio/wav";
@@ -147,11 +135,6 @@ namespace SynthesizerAudio
             }
             var audio = await TextToSpeechAudioAsync(text, format);
             return new SynthesizerWebAudioResponse(audio, contentType, audio.Length);
-        }
-
-        public void Dispose()
-        {
-            SpeechSynthesizer?.Dispose();
         }
 
         public class SynthesizerWebAudioResponse

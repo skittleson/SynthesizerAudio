@@ -8,7 +8,7 @@ namespace SynthesizerAudio
 
     public interface IVorbisEncoder
     {
-        void ConvertWavToOgg(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount);
+        void Encode(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount);
     }
 
     public class VorbisEncoder : IVorbisEncoder
@@ -18,7 +18,7 @@ namespace SynthesizerAudio
         public VorbisEncoder() { }
         public static IVorbisEncoder New() => new VorbisEncoder();
 
-        public void ConvertWavToOgg(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount)
+        public void Encode(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount)
             => ConvertPCMFile(source, destination, samplesPerSecond, channelCount);
 
         public static void ConvertPCMFile(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount)

@@ -13,7 +13,7 @@ namespace SpeakingWebApplication.Controllers
         [HttpGet]
         public async Task<FileStreamResult> Get([FromQuery] string text)
         {
-            var synthesizerAudioFactory = new SynthesizerWebAudioService(VorbisEncoder.New());
+            var synthesizerAudioFactory = new SynthesizerWebAudioService();
             var synthResponse = await synthesizerAudioFactory.HandleRequest(text, SynthesizerWebAudioService.AUDIO_FORMAT.MP3);
             return new FileStreamResult(synthResponse.AudioStream, Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse(synthResponse.ContentType));
         }

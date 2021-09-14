@@ -6,7 +6,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Spencer Kittleson</Authors>
     <Company>Do Code That Matters</Company>
-    <PackageProjectUrl>https://github.com/skittleson/SpeakingWebApp</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/skittleson/SynthesizerAudio</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

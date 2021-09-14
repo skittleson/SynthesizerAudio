@@ -12,8 +12,7 @@ namespace SimpleSpeakingWebApp
         static void Main(string[] args)
         {
             var s = new Server("127.0.0.1", 9000, false, DefaultRoute);
-            s.Routes.Static.Add(HttpMethod.GET, "/api/texttoaudio.mp3", GetTextToAudio);
-            s.Routes.Static.Add(HttpMethod.GET, "/api/texttoaudio.ogg", GetTextToAudio);
+            s.Routes.Static.Add(HttpMethod.GET, "/api/texttoaudio", GetTextToAudio);
             s.Start();
             Console.ReadLine();
         }
@@ -29,8 +28,8 @@ namespace SimpleSpeakingWebApp
 
         static async Task GetTextToAudio(HttpContext ctx)
         {
-            var synthesizerAudioFactory = new SynthesizerWebAudioService(VorbisEncoder.New());
-            var synthResponse = await synthesizerAudioFactory.HandleRequest(new Uri(ctx.Request.Url.Full));
+            var synthesizerAudioFactory = new SynthesizerWebAudioService();
+            var synthResponse = await synthesizerAudioFactory.HandleRequestAsync(new Uri(ctx.Request.Url.Full));
             ctx.Response.StatusCode = 200;
             ctx.Response.ContentType = synthResponse.ContentType;
             ctx.Response.ContentLength = synthResponse.ContentLength;
