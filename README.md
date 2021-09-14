@@ -12,31 +12,8 @@ Inspired and battle tested for years from my initial tip: https://www.codeprojec
 
 Install [nuget package](https://www.nuget.org/packages/SynthesizerAudio/)
 
-Web server request/response using WatsonWebserver
-```csharp
-static async Task GetTextToAudio(HttpContext ctx)
-    {
-        try
-        {
-            var requestUrl = new Uri(ctx.Request.Url.Full);
-            var synthesizerAudioFactory = new SynthesizerWebAudioService();
-            var synthResponse = await synthesizerAudioFactory.HandleGetWebRequestAsync(requestUrl);
-            ctx.Response.StatusCode = 200;
-            ctx.Response.ContentType = synthResponse.ContentType;
-            ctx.Response.ContentLength = synthResponse.ContentLength;
-            ctx.Response.Headers.Add("Accept-Ranges", "bytes");
-            await ctx.Response.Send(synthResponse.ToArray());
-        }
-        catch (Exception ex)
-        {
-            ctx.Response.StatusCode = 500;
-            await ctx.Response.Send(ex.InnerException.Message);
-        }
-    }
-```
 
-
-If using WebApi, method in controller
+If using WebApi, an example controller.
 
 ```csharp
 [Route("api/[controller]")]
@@ -55,7 +32,7 @@ If using WebApi, method in controller
 ```
 
 
-Play it from 
+Mark up in HTML 
 ```html
 <audio id="textToSpeech" controls>
     <source src="/api/texttoaudio?text=hello%20world&type=ogg" type="audio/ogg">
@@ -66,13 +43,37 @@ Play it from
     </p>
 </audio>
 ```
+Check out the examples directory for more.
 
-Check out the examples folder
+
+Web server request/response using WatsonWebserver
+```csharp
+static async Task GetTextToAudio(HttpContext ctx)
+{
+    try
+    {
+        var requestUrl = new Uri(ctx.Request.Url.Full);
+        var synthesizerAudioFactory = new SynthesizerWebAudioService();
+        var synthResponse = await synthesizerAudioFactory.HandleGetWebRequestAsync(requestUrl);
+        ctx.Response.StatusCode = 200;
+        ctx.Response.ContentType = synthResponse.ContentType;
+        ctx.Response.ContentLength = synthResponse.ContentLength;
+        ctx.Response.Headers.Add("Accept-Ranges", "bytes");
+        await ctx.Response.Send(synthResponse.ToArray());
+    }
+    catch (Exception ex)
+    {
+        ctx.Response.StatusCode = 500;
+        await ctx.Response.Send(ex.InnerException.Message);
+    }
+}
+```
+
 
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome.<br />
-Feel free to check [issues page](https://github.com/skittleson/SpeakingWebApp/issues) if you want to contribute.<br />
+Feel free to check [issues page](https://github.com/skittleson/SynthesizerAudio/issues) if you want to contribute.<br />
 
 ## Author
 
