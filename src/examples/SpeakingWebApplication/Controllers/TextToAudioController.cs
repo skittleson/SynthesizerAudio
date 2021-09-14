@@ -14,7 +14,7 @@ namespace SpeakingWebApplication.Controllers
         public async Task<FileStreamResult> Get([FromQuery] string text)
         {
             var synthesizerAudioFactory = new SynthesizerWebAudioService();
-            var synthResponse = await synthesizerAudioFactory.HandleRequest(text, SynthesizerWebAudioService.AUDIO_FORMAT.MP3);
+            var synthResponse = await synthesizerAudioFactory.WebResponseAsync(text);
             return new FileStreamResult(synthResponse.AudioStream, Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse(synthResponse.ContentType));
         }
     }

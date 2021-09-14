@@ -38,7 +38,7 @@ namespace SynthesizerAudio.Tests
 
 
             // Act
-            var response = await service.HandleRequestAsync(requestUrl);
+            var response = await service.HandleGetWebRequestAsync(requestUrl);
 
             // Assert
             Assert.Equal("audio/mp3", response.ContentType);

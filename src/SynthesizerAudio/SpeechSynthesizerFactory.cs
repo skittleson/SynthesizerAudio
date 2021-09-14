@@ -16,7 +16,7 @@ namespace SynthesizerAudio
 
         public SpeechSynthesizerFactory()
         {
-
+            SpeechSynthesizer = new SpeechSynthesizer();
         }
 
         public async Task<MemoryStream> GetStreamAsync(string text, SpeechAudioFormatInfo speechAudioFormatConfig)
@@ -32,7 +32,7 @@ namespace SynthesizerAudio
             prompt.EndVoice();
 
             // Setup speech synthesizer to stream
-            using var speechSynthesizerStream = new MemoryStream();
+            var speechSynthesizerStream = new MemoryStream();
             SpeechSynthesizer.SetOutputToAudioStream(
                 audioDestination: speechSynthesizerStream,
                 formatInfo: speechAudioFormatConfig);

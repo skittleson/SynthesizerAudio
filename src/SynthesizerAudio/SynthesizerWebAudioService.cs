@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Speech.AudioFormat;
-using System.Speech.Synthesis;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -52,7 +49,7 @@ namespace SynthesizerAudio
         //        .ToArray();
         //}
 
-        public async Task<MemoryStream> TextToSpeechAudioAsync(string text, AUDIO_FORMAT format)
+        public async Task<MemoryStream> TextToSpeechAudioAsync(string text, TextToSpeechAudioOptions options = null)
         {
             var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
@@ -61,13 +58,14 @@ namespace SynthesizerAudio
 
             // Speech format: https://docs.microsoft.com/en-us/dotnet/api/system.speech.audioformat?view=netframework-4.8
             var speechAudioFormatConfig = new SpeechAudioFormatInfo(
-                samplesPerSecond: 16000,
+                samplesPerSecond: 8000,
                 bitsPerSample: AudioBitsPerSample.Sixteen,
                 channel: AudioChannel.Stereo);
 
             var speechSynthesizerStream = await SpeechSynthesizerFactory.GetStreamAsync(text, speechAudioFormatConfig);
 
             // Convert wav stream to mp3 or ogg
+            var format = options?.Format ?? AUDIO_FORMAT.MP3;
             switch (format)
             {
                 case AUDIO_FORMAT.MP3:
@@ -93,7 +91,7 @@ namespace SynthesizerAudio
             return audioStream;
         }
 
-        public async Task<SynthesizerWebAudioResponse> HandleRequestAsync(Uri requestedUrl)
+        public async Task<SynthesizerWebAudioResponse> HandleGetWebRequestAsync(Uri requestedUrl)
         {
             var queryParams = HttpUtility.ParseQueryString(requestedUrl.Query);
             var text = queryParams["text"];
@@ -111,17 +109,16 @@ namespace SynthesizerAudio
                     format = AUDIO_FORMAT.WAV;
                     break;
             }
-            return await HandleRequest(text, format);
+            return await WebResponseAsync(text, new TextToSpeechAudioOptions { Format = format });
         }
-        public async Task<SynthesizerWebAudioResponse> HandleRequest(string text, AUDIO_FORMAT format)
+        public async Task<SynthesizerWebAudioResponse> WebResponseAsync(string text, TextToSpeechAudioOptions options = null)
         {
-
             if (string.IsNullOrEmpty(text))
             {
                 throw new MissingParameters("text");
             }
             var contentType = "audio/mp3";
-            switch (format)
+            switch (options?.Format)
             {
                 case AUDIO_FORMAT.OGG:
                     contentType = "audio/ogg";
@@ -133,7 +130,7 @@ namespace SynthesizerAudio
                     contentType = "audio/wav";
                     break;
             }
-            var audio = await TextToSpeechAudioAsync(text, format);
+            var audio = await TextToSpeechAudioAsync(text, options);
             return new SynthesizerWebAudioResponse(audio, contentType, audio.Length);
         }
 
@@ -152,6 +149,11 @@ namespace SynthesizerAudio
             public long ContentLength { get; }
 
             public byte[] ToArray() => AudioStream?.ToArray() ?? new byte[0];
+        }
+
+        public class TextToSpeechAudioOptions
+        {
+            public AUDIO_FORMAT Format { get; set; }
         }
 
         public class MissingParameters : Exception

@@ -1,5 +1,8 @@
 ﻿# Synthesizer Audio
-> Synthesize text to audio in a web app - this is an example how to setup a website to generate a text to audio WAV/MP3/OGG, then stream it for a browser client using HTML 5 audio controls.
+> Synthesize text to speech audio in a web app - this is a utility and example synthesize text to an audio format WAV/MP3/OGG, then stream it to a browser client using HTML5 audio tag.
+
+Inspired and battle tested for years from my initial tip: https://www.codeproject.com/tips/1031689/speaking-asp-net-website
+
 
 <!-- ## ✨ Demo
 
@@ -7,17 +10,64 @@
 
 ## 🚀 Quick Start
 
-Download the latest and run
+Install [nuget package](https://www.nuget.org/packages/SynthesizerAudio/)
 
+Web server request/response using WatsonWebserver
 ```csharp
- [HttpGet]
-    public async Task<FileStreamResult> Get([FromQuery] string text)
+static async Task GetTextToAudio(HttpContext ctx)
     {
-        var synthesizerAudioFactory = new SynthesizerAudioFactory();
-        var audio = await synthesizerAudioFactory.TextToSpeechAudioAsync(text, SynthesizerAudioFactory.AUDIO_FORMAT.MP3);
-        return new FileStreamResult(audio, Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("audio/mpeg"));
+        try
+        {
+            var requestUrl = new Uri(ctx.Request.Url.Full);
+            var synthesizerAudioFactory = new SynthesizerWebAudioService();
+            var synthResponse = await synthesizerAudioFactory.HandleGetWebRequestAsync(requestUrl);
+            ctx.Response.StatusCode = 200;
+            ctx.Response.ContentType = synthResponse.ContentType;
+            ctx.Response.ContentLength = synthResponse.ContentLength;
+            ctx.Response.Headers.Add("Accept-Ranges", "bytes");
+            await ctx.Response.Send(synthResponse.ToArray());
+        }
+        catch (Exception ex)
+        {
+            ctx.Response.StatusCode = 500;
+            await ctx.Response.Send(ex.InnerException.Message);
+        }
     }
 ```
+
+
+If using WebApi, method in controller
+
+```csharp
+[Route("api/[controller]")]
+    [ApiController]
+    public class TextToAudioController : ControllerBase
+    {
+
+        [HttpGet]
+        public async Task<FileStreamResult> Get([FromQuery] string text)
+        {
+            var synthesizerAudioFactory = new SynthesizerWebAudioService();
+            var synthResponse = await synthesizerAudioFactory.WebResponseAsync(text);
+            return new FileStreamResult(synthResponse.AudioStream, Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse(synthResponse.ContentType));
+        }
+    }
+```
+
+
+Play it from 
+```html
+<audio id="textToSpeech" controls>
+    <source src="/api/texttoaudio?text=hello%20world&type=ogg" type="audio/ogg">
+    <source src="/api/texttoaudio?text=hello%20world&type=mp3" type="audio/mpeg">
+    <p>
+        Your browser doesn't support HTML5 audio. Here is
+        a <a href="/api/texttoaudio?text=hello%20world&type=mp3">link to the audio</a> instead.
+    </p>
+</audio>
+```
+
+Check out the examples folder
 
 ## 🤝 Contributing
 

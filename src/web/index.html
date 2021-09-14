@@ -23,21 +23,47 @@
     <div style="margin:1%;">
         <textarea id="inputText" class="form-control"
                   rows="5" style="width:100%;" placeholder="Type anything you would like to be echoed back."></textarea><br />
-        <button id="playAudio" type="button"
+        <button id="playAudioBtn" type="button"
                 class="btn btn-primary btn-lg btn-block">
             Say it!
         </button>
         <br />
-        <audio controls>
-            <source src="/api/texttoaudio?text=hello%20world&type=mp3" type="audio/mpeg">
+        <audio id="textToSpeech" controls>
             <source src="/api/texttoaudio?text=hello%20world&type=ogg" type="audio/ogg">
+            <source src="/api/texttoaudio?text=hello%20world&type=mp3" type="audio/mpeg">
             <p>
                 Your browser doesn't support HTML5 audio. Here is
-                a <a href="/api/texttoaudio?text=hello%world">link to the audio</a> instead.
+                a <a href="/api/texttoaudio?text=hello%20world&type=mp3">link to the audio</a> instead.
             </p>
         </audio>
 
     </div>
 
+    <script type="text/javascript">
+        document.getElementById('playAudioBtn').onclick = function () {
+            const text = document.getElementById('inputText').value;
+            let textToAudioUrl = new URL(`${window.document.location.origin}/api/texttoaudio`);
+            textToAudioUrl.searchParams.append('type', 'mp3');
+            textToAudioUrl.searchParams.append('text', text);
+            textToAudioUrl.searchParams.append('seed', new Date().getTime());
+
+            const sourceElement = document.createElement('source');
+            sourceElement.src = textToAudioUrl.toString();
+            sourceElement.type = "audio/mpeg";
+
+            textToAudioUrl.searchParams.delete('type');
+            textToAudioUrl.searchParams.append('type', 'ogg');
+            const sourceElement2 = sourceElement.cloneNode();
+            sourceElement2.type = "audio/ogg";
+            sourceElement.src = textToAudioUrl.toString();
+
+            // Replace new sources in audio element
+            const audioElement = document.getElementById('textToSpeech');
+            audioElement.innerHTML = null;
+            audioElement.appendChild(sourceElement);
+            audioElement.appendChild(sourceElement2);
+            audioElement.load();
+        }
+    </script>
 </body>
 </html>

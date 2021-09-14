@@ -18,7 +18,7 @@ namespace SynthesizerAudio.Tests
         public async Task Can_convert_text_to_wav()
         {
             // Act
-            var result = await service.TextToSpeechAudioAsync("this is a test", SynthesizerWebAudioService.AUDIO_FORMAT.WAV);
+            var result = await service.TextToSpeechAudioAsync("this is a test", new SynthesizerWebAudioService.TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.WAV });
 
             // Assert
             var saveFileLocation = System.IO.Path.Combine(Environment.CurrentDirectory, "test.wav");
@@ -29,7 +29,7 @@ namespace SynthesizerAudio.Tests
         public async Task Can_convert_text_to_mp3()
         {
             // Act
-            var result = await service.TextToSpeechAudioAsync("this is a test", SynthesizerWebAudioService.AUDIO_FORMAT.MP3);
+            var result = await service.TextToSpeechAudioAsync("this is a test", new SynthesizerWebAudioService.TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.MP3 });
 
             // Assert
             var saveFileLocation = System.IO.Path.Combine(Environment.CurrentDirectory, "test.mp3");
@@ -42,7 +42,7 @@ namespace SynthesizerAudio.Tests
         public async Task Can_convert_text_to_ogg()
         {
             // Act
-            var result = await service.TextToSpeechAudioAsync("this is a test", SynthesizerWebAudioService.AUDIO_FORMAT.OGG);
+            var result = await service.TextToSpeechAudioAsync("this is a test", new SynthesizerWebAudioService.TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.OGG });
 
             // Assert
             var saveFileLocation = System.IO.Path.Combine(Environment.CurrentDirectory, "test.ogg");
