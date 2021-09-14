@@ -12,6 +12,16 @@ Inspired and battle tested for years from my initial tip: https://www.codeprojec
 
 Install [nuget package](https://www.nuget.org/packages/SynthesizerAudio/)
 
+Default usage to stream converted text to a file.
+```csharp
+public async Task SaveFile()
+{
+    var synthWebAudio = new SynthesizerWebAudioService();
+    var audioStream = await synthWebAudio.TextToSpeechAudioAsync("hello world");
+    var saveFileLocation = Path.Combine(Environment.CurrentDirectory, "test.mp3");
+    await File.WriteAllBytesAsync(saveFileLocation, audioStream.ToArray());
+}
+```
 
 If using WebApi, here is an example. See [full example](src/examples/SpeakingWebApplication/Controllers/TextToAudioController.cs) here.
 
@@ -48,7 +58,7 @@ Check out the examples directory for more.
 Web server request/response using WatsonWebserver See [full example](src/examples/SimpleSpeakingWebApp/Program.cs).
 
 ```csharp
-static async Task GetTextToAudio(HttpContext ctx)
+static async Task GetTextToAudioAsync(HttpContext ctx)
 {
     try
     {

@@ -1,8 +1,6 @@
 ﻿using SynthesizerAudio;
 using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 using WatsonWebserver;
 
 namespace SimpleSpeakingWebApp
@@ -11,13 +9,13 @@ namespace SimpleSpeakingWebApp
     {
         static void Main(string[] args)
         {
-            var s = new Server("127.0.0.1", 5001, false, DefaultRoute);
-            s.Routes.Static.Add(HttpMethod.GET, "/api/texttoaudio", GetTextToAudio);
+            var s = new Server("127.0.0.1", 5001, false, DefaultRouteAsync);
+            s.Routes.Static.Add(HttpMethod.GET, "/api/texttoaudio", GetTextToAudioDefaultAsync);
             s.Start();
             Console.ReadLine();
         }
 
-        static async Task DefaultRoute(HttpContext ctx)
+        static async Task DefaultRouteAsync(HttpContext ctx)
         {
             ctx.Response.StatusCode = 200;
             ctx.Response.ContentType = "text/html";
@@ -26,7 +24,7 @@ namespace SimpleSpeakingWebApp
             await ctx.Response.Send(content);
         }
 
-        static async Task GetTextToAudio(HttpContext ctx)
+        static async Task GetTextToAudioDefaultAsync(HttpContext ctx)
         {
             try
             {

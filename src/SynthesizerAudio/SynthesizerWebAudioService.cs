@@ -4,10 +4,23 @@ using System.Speech.AudioFormat;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using static SynthesizerAudio.SynthesizerWebAudioService;
 
 namespace SynthesizerAudio
 {
-    public class SynthesizerWebAudioService
+    public interface ISynthesizerWebAudioService
+    {
+        Task<MemoryStream> TextToSpeechAudioAsync(string text, TextToSpeechAudioOptions options = null);
+        Task<SynthesizerWebAudioResponse> HandleGetWebRequestAsync(Uri requestedUrl);
+        Task<SynthesizerWebAudioResponse> WebResponseAsync(string text, TextToSpeechAudioOptions options = null);
+    }
+
+    public class TextToSpeechAudioOptions
+    {
+        public AUDIO_FORMAT Format { get; set; }
+    }
+
+    public class SynthesizerWebAudioService : ISynthesizerWebAudioService
     {
         //--- Private Properties ---
         private IVorbisEncoder VorbisEncoder { get; }
@@ -151,10 +164,7 @@ namespace SynthesizerAudio
             public byte[] ToArray() => AudioStream?.ToArray() ?? new byte[0];
         }
 
-        public class TextToSpeechAudioOptions
-        {
-            public AUDIO_FORMAT Format { get; set; }
-        }
+
 
         public class MissingParameters : Exception
         {

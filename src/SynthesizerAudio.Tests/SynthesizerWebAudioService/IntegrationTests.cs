@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -13,36 +14,33 @@ namespace SynthesizerAudio.Tests
             service = new SynthesizerWebAudioService();
         }
 
-
         [Fact]
         public async Task Can_convert_text_to_wav()
         {
             // Act
-            var result = await service.TextToSpeechAudioAsync("this is a test", new SynthesizerWebAudioService.TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.WAV });
+            var result = await service.TextToSpeechAudioAsync("this is a test", new TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.WAV });
 
             // Assert
-            var saveFileLocation = System.IO.Path.Combine(Environment.CurrentDirectory, "test.wav");
-            await System.IO.File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
+            var saveFileLocation = Path.Combine(Environment.CurrentDirectory, "test.wav");
+            await File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
         }
 
         [Fact]
         public async Task Can_convert_text_to_mp3()
         {
             // Act
-            var result = await service.TextToSpeechAudioAsync("this is a test", new SynthesizerWebAudioService.TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.MP3 });
+            var result = await service.TextToSpeechAudioAsync("this is a test", new TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.MP3 });
 
             // Assert
             var saveFileLocation = System.IO.Path.Combine(Environment.CurrentDirectory, "test.mp3");
             await System.IO.File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
-
-
         }
 
         [Fact]
         public async Task Can_convert_text_to_ogg()
         {
             // Act
-            var result = await service.TextToSpeechAudioAsync("this is a test", new SynthesizerWebAudioService.TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.OGG });
+            var result = await service.TextToSpeechAudioAsync("this is a test", new TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.OGG });
 
             // Assert
             var saveFileLocation = System.IO.Path.Combine(Environment.CurrentDirectory, "test.ogg");
