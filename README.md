@@ -13,7 +13,7 @@ Inspired and battle tested for years from my initial tip: https://www.codeprojec
 Install [nuget package](https://www.nuget.org/packages/SynthesizerAudio/)
 
 
-If using WebApi, an example controller.
+If using WebApi, here is an example. See [full example](src/examples/SpeakingWebApplication/Controllers/TextToAudioController.cs) here.
 
 ```csharp
 [Route("api/[controller]")]
@@ -31,8 +31,7 @@ If using WebApi, an example controller.
     }
 ```
 
-
-Mark up in HTML 
+Mark up in HTML. See [full example](src/web/index.html) for dynamic javascript loading.
 ```html
 <audio id="textToSpeech" controls>
     <source src="/api/texttoaudio?text=hello%20world&type=ogg" type="audio/ogg">
@@ -46,7 +45,8 @@ Mark up in HTML
 Check out the examples directory for more.
 
 
-Web server request/response using WatsonWebserver
+Web server request/response using WatsonWebserver See [full example](src/examples/SimpleSpeakingWebApp/Program.cs).
+
 ```csharp
 static async Task GetTextToAudio(HttpContext ctx)
 {
