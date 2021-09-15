@@ -4,15 +4,16 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-//All Credits - https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder/blob/2ee366a2c6a92f095e0cfdaf0ae5d047fdb1cc35/OggVorbisEncoder.Example/Encoder.cs#L48
 namespace SynthesizerAudio
 {
-
     public interface IVorbisEncoder
     {
         Task EncodeAsync(WaveStream source, MemoryStream destination);
     }
 
+    /// <summary>
+    /// All Credits - https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder/blob/2ee366a2c6a92f095e0cfdaf0ae5d047fdb1cc35/OggVorbisEncoder.Example/Encoder.cs#L48
+    /// </summary>
     public class VorbisEncoder : IVorbisEncoder
     {
         private static readonly int WriteBufferSize = 512;
