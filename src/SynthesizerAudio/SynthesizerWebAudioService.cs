@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Speech.AudioFormat;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -18,6 +17,7 @@ namespace SynthesizerAudio
     public class TextToSpeechAudioOptions
     {
         public AUDIO_FORMAT Format { get; set; }
+        public string VoiceName { get; set; }
     }
 
     public class SynthesizerWebAudioService : ISynthesizerWebAudioService
@@ -54,48 +54,26 @@ namespace SynthesizerAudio
             OGG = 4
         }
 
-        //public string[] GetVoiceNames()
-        //{
-        //    return SpeechSynthesizer
-        //        .GetInstalledVoices()
-        //        .Select(x => x.VoiceInfo.Name)
-        //        .ToArray();
-        //}
+        public string[] GetVoiceNames() => SpeechSynthesizerFactory.Voices();
 
         public async Task<MemoryStream> TextToSpeechAudioAsync(string text, TextToSpeechAudioOptions options = null)
         {
-            var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-
             // Setup audio stream to return on response
             var audioStream = new MemoryStream();
-
-            // Speech format: https://docs.microsoft.com/en-us/dotnet/api/system.speech.audioformat?view=netframework-4.8
-            var speechAudioFormatConfig = new SpeechAudioFormatInfo(
-                samplesPerSecond: 8000,
-                bitsPerSample: AudioBitsPerSample.Sixteen,
-                channel: AudioChannel.Stereo);
-
-            var speechSynthesizerStream = await SpeechSynthesizerFactory.GetStreamAsync(text, speechAudioFormatConfig);
+            var speechSynthesizerStream = await SpeechSynthesizerFactory.GetStreamAsync(text, options);
 
             // Convert wav stream to mp3 or ogg
             var format = options?.Format ?? AUDIO_FORMAT.MP3;
             switch (format)
             {
                 case AUDIO_FORMAT.MP3:
-                    await Mp3Encoder.EncodeAsync(
-                        speechSynthesizerStream,
-                        audioStream,
-                        speechAudioFormatConfig);
+                    await Mp3Encoder.EncodeAsync(speechSynthesizerStream, audioStream);
                     break;
                 case AUDIO_FORMAT.OGG:
-                    VorbisEncoder.Encode(
-                        speechSynthesizerStream,
-                        audioStream,
-                        speechAudioFormatConfig.SamplesPerSecond,
-                        speechAudioFormatConfig.ChannelCount);
+                    await VorbisEncoder.EncodeAsync(speechSynthesizerStream, audioStream);
                     break;
                 default:
-                    await speechSynthesizerStream.CopyToAsync(audioStream, cancellationToken.Token);
+                    await SpeechSynthesizerFactory.CopyToAsync(speechSynthesizerStream, audioStream);
                     break;
             }
 

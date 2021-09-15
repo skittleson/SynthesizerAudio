@@ -8,22 +8,15 @@ namespace SynthesizerAudio
 {
     public interface IMp3Encoder
     {
-        Task EncodeAsync(MemoryStream source, MemoryStream destination, SpeechAudioFormatInfo speechAudioFormatInfo);
+        Task EncodeAsync(WaveStream source, MemoryStream destination);
     }
     public class Mp3Encoder : IMp3Encoder
     {
-        public async Task EncodeAsync(MemoryStream source, MemoryStream destination, SpeechAudioFormatInfo speechAudioFormatInfo)
+        public async Task EncodeAsync(WaveStream source, MemoryStream destination)
         {
-            // NAudio wave format has to be the same as speech audio format
-            var waveFormat = new WaveFormat(
-                rate: speechAudioFormatInfo.SamplesPerSecond,
-                bits: speechAudioFormatInfo.BitsPerSample,
-                channels: speechAudioFormatInfo.ChannelCount);
-            var bitRate = (speechAudioFormatInfo.AverageBytesPerSecond * 8);
-
-            // Encode to mp3
-            using var mp3StreamWriter = new LameMP3FileWriter(outStream: destination, format: waveFormat, bitRate: bitRate);
-            await source.CopyToAsync(mp3StreamWriter);
+            using (WaveStream wav = WaveFormatConversionStream.CreatePcmStream(source))
+            using (var mp3 = new LameMP3FileWriter(destination, source.WaveFormat, LAMEPreset.STANDARD))
+                await wav.CopyToAsync(mp3);
         }
     }
 }

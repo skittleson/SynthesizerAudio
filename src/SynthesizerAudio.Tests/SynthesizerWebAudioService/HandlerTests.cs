@@ -1,4 +1,5 @@
 ﻿using Moq;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,16 +33,26 @@ namespace SynthesizerAudio.Tests
 
             // Arrange
             var requestUrl = new Uri("http://foo.bar?text=hello%20world&type=mp3");
-            var ms = new MemoryStream();
-            SynthesizerMock.Setup(x => x.GetStreamAsync("hello world", It.IsAny<SpeechAudioFormatInfo>())).ReturnsAsync(ms);
-            Mp3EncoderMock.Setup(x => x.EncodeAsync(ms, It.IsAny<MemoryStream>(), It.IsAny<SpeechAudioFormatInfo>())).Returns(Task.CompletedTask); ;
+            SynthesizerMock.Setup(x => x.GetStreamAsync("hello world", It.IsAny<TextToSpeechAudioOptions>())).ReturnsAsync(await MockWaveStreamAsync());
+            Mp3EncoderMock.Setup(x => x.EncodeAsync(It.IsAny<WaveStream>(), It.IsAny<MemoryStream>())).Returns(Task.CompletedTask);
 
 
             // Act
             var response = await service.HandleGetWebRequestAsync(requestUrl);
 
             // Assert
+
             Assert.Equal("audio/mp3", response.ContentType);
         }
+
+        private async Task<WaveStream> MockWaveStreamAsync()
+        {
+            var outStream = new MemoryStream();
+            var d = new WaveFileWriter(outStream, new WaveFormat());
+            await d.FlushAsync();
+            outStream.Position = 0;
+            return new WaveFileReader(outStream);
+        }
+
     }
 }

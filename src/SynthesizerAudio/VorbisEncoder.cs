@@ -1,6 +1,8 @@
-﻿using OggVorbisEncoder;
+﻿using NAudio.Wave;
+using OggVorbisEncoder;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 //All Credits - https://github.com/SteveLillis/.NET-Ogg-Vorbis-Encoder/blob/2ee366a2c6a92f095e0cfdaf0ae5d047fdb1cc35/OggVorbisEncoder.Example/Encoder.cs#L48
 namespace SynthesizerAudio
@@ -8,7 +10,7 @@ namespace SynthesizerAudio
 
     public interface IVorbisEncoder
     {
-        void Encode(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount);
+        Task EncodeAsync(WaveStream source, MemoryStream destination);
     }
 
     public class VorbisEncoder : IVorbisEncoder
@@ -18,20 +20,26 @@ namespace SynthesizerAudio
         public VorbisEncoder() { }
         public static IVorbisEncoder New() => new VorbisEncoder();
 
-        public void Encode(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount)
-            => ConvertPCMFile(source, destination, samplesPerSecond, channelCount);
+        public async Task EncodeAsync(WaveStream source, MemoryStream destination)
+            => await CreatePCMAsync(source, destination);
 
-        public static void ConvertPCMFile(MemoryStream source, MemoryStream destination, int samplesPerSecond, int channelCount)
+        public static async Task CreatePCMAsync(WaveStream source, MemoryStream destination)
         {
             source.Position = 0;
+            byte[] buffer = new byte[4096];
+            var wav = new MemoryStream();
+            int reader;
+            while ((reader = await source.ReadAsync(buffer, 0, buffer.Length)) != 0)
+                await wav.WriteAsync(buffer, 0, reader);
+
             var oggBytes = ConvertRawPCMFile(
-                samplesPerSecond,
-                channelCount,
-                source.ToArray(),
-                PcmSample.SixteenBit,
-                samplesPerSecond,
-                channelCount);
-            destination.Write(oggBytes, 0, oggBytes.Length);
+                source.WaveFormat.SampleRate,
+                source.WaveFormat.Channels,
+                wav.ToArray(),
+                source.WaveFormat.BitsPerSample == 16 ? PcmSample.SixteenBit : PcmSample.EightBit,
+                source.WaveFormat.AverageBytesPerSecond,
+                source.WaveFormat.Channels);
+            await destination.WriteAsync(oggBytes, 0, oggBytes.Length);
         }
 
         private static byte[] ConvertRawPCMFile(int outputSampleRate, int outputChannels, byte[] pcmSamples, PcmSample pcmSampleSize, int pcmSampleRate, int pcmChannels)
@@ -40,6 +48,7 @@ namespace SynthesizerAudio
             float pcmDuraton = numPcmSamples / (float)pcmSampleRate;
 
             int numOutputSamples = (int)(pcmDuraton * outputSampleRate);
+
             //Ensure that samble buffer is aligned to write chunk size
             numOutputSamples = (numOutputSamples / WriteBufferSize) * WriteBufferSize;
 

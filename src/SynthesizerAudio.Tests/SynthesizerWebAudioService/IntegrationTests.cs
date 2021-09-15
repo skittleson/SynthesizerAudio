@@ -14,6 +14,21 @@ namespace SynthesizerAudio.Tests
             service = new SynthesizerWebAudioService();
         }
 
+        [Fact(Skip = "Only play when audio confirmation is needed")]
+        public async Task Can_play_text_to_wav()
+        {
+            // Act
+            var streamAudio = await service.TextToSpeechAudioAsync("this is a test", new TextToSpeechAudioOptions()
+            {
+                Format = SynthesizerWebAudioService.AUDIO_FORMAT.WAV,
+                VoiceName = "David"
+            });
+
+            // Assert
+            using System.Media.SoundPlayer sound = new System.Media.SoundPlayer(streamAudio);
+            sound.Play();
+        }
+
         [Fact]
         public async Task Can_convert_text_to_wav()
         {
@@ -47,14 +62,12 @@ namespace SynthesizerAudio.Tests
             await System.IO.File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
         }
 
-        //[Fact]
-        //public void Can_get_voices()
-        //{
-
-        //    var voices = service.GetVoiceNames();
-        //    Assert.True(voices.Length > 2);
-
-        //}
+        [Fact]
+        public void Can_get_voices()
+        {
+            var voices = service.GetVoiceNames();
+            Assert.True(voices.Length >= 2);
+        }
 
     }
 }
