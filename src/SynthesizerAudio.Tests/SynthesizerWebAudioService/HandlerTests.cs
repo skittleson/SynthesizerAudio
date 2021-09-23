@@ -44,8 +44,8 @@ namespace SynthesizerAudio.Tests
         private async Task<WaveStream> MockWaveStreamAsync()
         {
             var outStream = new MemoryStream();
-            var d = new WaveFileWriter(outStream, new WaveFormat());
-            await d.FlushAsync();
+            var writer = new WaveFileWriter(outStream, new WaveFormat());
+            await writer.FlushAsync();
             outStream.Position = 0;
             return new WaveFileReader(outStream);
         }

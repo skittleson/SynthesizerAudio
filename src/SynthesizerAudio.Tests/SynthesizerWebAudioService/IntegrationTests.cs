@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
@@ -47,8 +48,12 @@ namespace SynthesizerAudio.Tests
             var result = await service.TextToSpeechAudioAsync("this is a test", new TextToSpeechAudioOptions() { Format = SynthesizerWebAudioService.AUDIO_FORMAT.MP3 });
 
             // Assert
-            var saveFileLocation = System.IO.Path.Combine(Environment.CurrentDirectory, "test.mp3");
-            await System.IO.File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
+            var saveFileLocation = Path.Combine(Environment.CurrentDirectory, "test.mp3");
+            await File.WriteAllBytesAsync(saveFileLocation, result.ToArray());
+            var reader = new Mp3FileReader(saveFileLocation);
+            Assert.Equal(1, reader.WaveFormat.Channels);
+            Assert.Equal(22050, reader.WaveFormat.SampleRate);
+            Assert.Equal(3, Math.Round(reader.TotalTime.TotalSeconds, 0));
         }
 
         [Fact]

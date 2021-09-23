@@ -11,10 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{57
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpeakingWebApplication", "examples\SpeakingWebApplication\SpeakingWebApplication.csproj", "{BB9BBC75-2C88-42B2-B2DA-8738657203F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleSpeakingWebApp", "examples\SimpleSpeakingWebApp\SimpleSpeakingWebApp.csproj", "{718AD126-B4BC-4C3B-B9D3-CC2C04C2A567}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSpeakingWebApp", "examples\SimpleSpeakingWebApp\SimpleSpeakingWebApp.csproj", "{718AD126-B4BC-4C3B-B9D3-CC2C04C2A567}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F4520D2F-2BD0-43E4-AED9-C938E730186E}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject

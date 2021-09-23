@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Speech.AudioFormat;
 using System.Speech.Synthesis;
 using System.Threading.Tasks;
 
@@ -64,13 +63,10 @@ namespace SynthesizerAudio
             await waveFileWriter.FlushAsync();
         }
 
-        public string[] Voices()
-        {
-            return SpeechSynthesizer
+        public string[] Voices() => SpeechSynthesizer
                   .GetInstalledVoices()
                   .Where(x => x.Enabled)
                   .Select(x => x.VoiceInfo.Name)
                   .ToArray();
-        }
     }
 }
