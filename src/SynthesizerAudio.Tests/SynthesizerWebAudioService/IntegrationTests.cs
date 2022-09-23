@@ -94,7 +94,7 @@ namespace SynthesizerAudio.Tests
         public async Task Can_use_polly() {
             // Arrange
             var text = @"The color of animals is by no means a matter of chance; it depends on many considerations, but in the majority of cases tends to protect the animal from danger by rendering it less conspicuous. Perhaps it may be said that if coloring is mainly protective, there ought to be but few brightly colored animals. There are, however, not a few cases in which vivid colors are themselves protective. The kingfisher itself, though so brightly colored, is by no means easy to see. The blue harmonizes with the water, and the bird as it darts along the stream looks almost like a flash of sunlight.";
-            //new BasicAWSCredentials("AKIAYNK6RNQGFKTTL6E3", "NT/o+Vr98SXoVE64rKY8Mb4yPgcv5G3HdxMeA8l+")
+
             // Act
             var synth = new SynthesizerWebAudioService(new AmazonPollySpeechSynthesizer());
             var streamAudio = await synth.TextToSpeechAudioAsync(text, new TextToSpeechAudioOptions() {
