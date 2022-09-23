@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SynthesizerAudio;
-using System;
 using System.Threading.Tasks;
 
 namespace SpeakingWebApplication.Controllers

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace SynthesizerAudio
 {
-    public interface IVorbisEncoder
-    {
-        Task EncodeAsync(WaveStream source, MemoryStream destination);
+    public interface IVorbisEncoder {
+        Task EncodeAsync(MemoryStream source, MemoryStream destination, TextToSpeechAudioOptions textToSpeechAudioOptions);
     }
 
     /// <summary>
@@ -21,25 +20,23 @@ namespace SynthesizerAudio
         public VorbisEncoder() { }
         public static IVorbisEncoder New() => new VorbisEncoder();
 
-        public async Task EncodeAsync(WaveStream source, MemoryStream destination)
-            => await CreatePCMAsync(source, destination);
-
-        public static async Task CreatePCMAsync(WaveStream source, MemoryStream destination)
+        public Task EncodeAsync(MemoryStream source, MemoryStream destination, TextToSpeechAudioOptions textToSpeechAudioOptions)
+            => EncodeAsync(source, destination, textToSpeechAudioOptions);
+        public static async Task CreatePCMAsync(MemoryStream source, MemoryStream destination, TextToSpeechAudioOptions textToSpeechAudioOptions)
         {
             source.Position = 0;
-            byte[] buffer = new byte[4096];
+            var buffer = new byte[4096];
             var wav = new MemoryStream();
             int reader;
             while ((reader = await source.ReadAsync(buffer, 0, buffer.Length)) != 0)
                 await wav.WriteAsync(buffer, 0, reader);
-
             var oggBytes = ConvertRawPCMFile(
-                source.WaveFormat.SampleRate,
-                source.WaveFormat.Channels,
+                textToSpeechAudioOptions.SampleRate,
+                textToSpeechAudioOptions.Channels,
                 wav.ToArray(),
-                source.WaveFormat.BitsPerSample == 16 ? PcmSample.SixteenBit : PcmSample.EightBit,
-                source.WaveFormat.AverageBytesPerSecond,
-                source.WaveFormat.Channels);
+                textToSpeechAudioOptions.BitsPerSample == 16 ? PcmSample.SixteenBit : PcmSample.EightBit,
+                textToSpeechAudioOptions.SampleRate,
+                textToSpeechAudioOptions.Channels);
             await destination.WriteAsync(oggBytes, 0, oggBytes.Length);
         }
 
@@ -125,10 +122,8 @@ namespace SynthesizerAudio
             // =========================================================
             var processingState = ProcessingState.Create(info);
 
-            for (int readIndex = 0; readIndex <= floatSamples[0].Length; readIndex += WriteBufferSize)
-            {
-                if (readIndex == floatSamples[0].Length)
-                {
+            for (int readIndex = 0; readIndex <= floatSamples[0].Length; readIndex += WriteBufferSize) {
+                if (readIndex == floatSamples[0].Length) {
                     processingState.WriteEndOfStream();
                 }
                 else

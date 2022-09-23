@@ -1,26 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Spencer Kittleson</Authors>
     <Company>Do Code That Matters</Company>
     <PackageProjectUrl>https://github.com/skittleson/SynthesizerAudio</PackageProjectUrl>
-    <Version>1.0.4</Version>
+    <Version>1.1.0</Version>
     <RepositoryUrl>https://github.com/skittleson/SynthesizerAudio</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Copyright>2021 Do Code That Matters</Copyright>
-    <Description>Synthesize text to speech audio in a web app - this is a utility to synthesize text to an audio format WAV/MP3/OGG</Description>
+    <Copyright>2022 Do Code That Matters</Copyright>
+    <Description>Synthesize text to speech audio in a web app - a library to synthesize text to an audio format WAV/MP3/OGG</Description>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
 
   <ItemGroup>
-    <PackageReference Include="NAudio" Version="2.0.1" />
-    <PackageReference Include="NAudio.Lame" Version="2.0.0"/>
-    <PackageReference Include="OggVorbisEncoder" Version="1.2.0" />
-    <PackageReference Include="System.Speech" Version="5.0.0" />
+    <PackageReference Include="AWSSDK.Polly" Version="3.7.7.23" />
+    <PackageReference Include="Microsoft.CognitiveServices.Speech" Version="1.23.0" />
+    <PackageReference Include="NAudio" Version="2.1.0" />
+    <PackageReference Include="NAudio.Lame" Version="2.0.1" />
+    <PackageReference Include="OggVorbisEncoder" Version="1.2.1" />
+    <PackageReference Include="SimpleExec" Version="11.0.0" />
+    <PackageReference Include="System.Speech" Version="6.0.0" />
   </ItemGroup>
 
 </Project>

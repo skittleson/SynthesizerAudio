@@ -19,11 +19,11 @@ csharp_indent_switch_labels = true
 #Formatting - new line options
 
 #place catch statements on a new line
-csharp_new_line_before_catch = false
+csharp_new_line_before_catch =false
 #place else statements on a new line
 csharp_new_line_before_else = false
 #require members of object intializers to be on separate lines
-csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_object_initializers =false
 #require braces to be on a new line for control_blocks, object_collection_array_initializers, methods, and types (also known as "Allman" style)
 #csharp_new_line_before_open_brace = control_blocks, object_collection_array_initializers, methods, types
 
@@ -63,7 +63,7 @@ csharp_preserve_single_line_statements = true
 #Style - Code block preferences
 
 #prefer curly braces even for one line of code
-csharp_prefer_braces = true:suggestion
+csharp_prefer_braces = true
 
 #Style - expression bodied member options
 
@@ -118,3 +118,10 @@ dotnet_style_qualification_for_field = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 #prefer properties not to be prefaced with this. or Me. in Visual Basic
 dotnet_style_qualification_for_property = false:suggestion
+csharp_new_line_before_open_brace=all
+csharp_new_line_before_members_in_anonymous_types=false
+csharp_new_line_between_query_expression_clauses=false
+csharp_new_line_before_finally=false
+
+[*.{cs,vb}]
+dotnet_style_allow_multiple_blank_lines_experimental=true:error

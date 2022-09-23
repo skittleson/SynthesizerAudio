@@ -36,8 +36,7 @@ namespace SimpleSpeakingWebApp
                 ctx.Response.ContentLength = synthResponse.ContentLength;
                 ctx.Response.Headers.Add("Accept-Ranges", "bytes");
                 await ctx.Response.Send(synthResponse.ToArray());
-            }
-            catch (Exception ex)
+            } catch (Exception ex)
             {
                 ctx.Response.StatusCode = 500;
                 await ctx.Response.Send(ex.InnerException.Message);

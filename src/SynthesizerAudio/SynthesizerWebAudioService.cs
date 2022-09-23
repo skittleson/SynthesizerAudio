@@ -13,10 +13,29 @@ namespace SynthesizerAudio
         Task<SynthesizerWebAudioResponse> WebResponseAsync(string text, TextToSpeechAudioOptions options = null);
     }
 
+    public enum AUDIO_FORMAT
+    {
+        WAV = 0,
+        MP3 = 2,
+        OGG = 4
+    }
+
+    public enum SPEECH_SPEED
+    {
+        DEFAULT = 0,
+        SLOW = 2,
+        MEDIUM = 4,
+        FAST = 8
+    }
+
     public class TextToSpeechAudioOptions
     {
         public AUDIO_FORMAT Format { get; set; }
         public string VoiceName { get; set; }
+        public SPEECH_SPEED Speed { get; set; }
+        public int SampleRate { get; set; } = 44100;
+        public int BitsPerSample { get; set; } = 16;
+        public int Channels { get; set; } = 1;
     }
 
     public class SynthesizerWebAudioService : ISynthesizerWebAudioService
@@ -24,36 +43,32 @@ namespace SynthesizerAudio
         //--- Private Properties ---
         private IVorbisEncoder VorbisEncoder { get; }
         private IMp3Encoder Mp3Encoder { get; }
-        private ISpeechSynthesizerFactory SpeechSynthesizerFactory { get; }
+        private ISpeechSynthesizer SpeechSynthesizerFactory { get; }
 
-
-        /// <summary>
-        /// Text to speech synthesizer for web audio
-        /// </summary>
-        /// <param name="vorbisEncoder">Vorbis encoder</param>
-        public SynthesizerWebAudioService(IVorbisEncoder vorbisEncoder, IMp3Encoder mp3Encoder, ISpeechSynthesizerFactory speechSynthesizerFactory)
-        {
-
-            VorbisEncoder = vorbisEncoder ?? throw new ArgumentNullException("Vorbis Encoder Required");
-            Mp3Encoder = mp3Encoder ?? throw new ArgumentNullException("Mp3 Encoder Required");
-            SpeechSynthesizerFactory = speechSynthesizerFactory ?? throw new ArgumentNullException("Speech Synthesizer Required");
+        public SynthesizerWebAudioService() {
+            VorbisEncoder = new VorbisEncoder();
+            Mp3Encoder = new Mp3Encoder();
+            SpeechSynthesizerFactory = new WindowsSpeechSynthesizer();
         }
 
-        public SynthesizerWebAudioService()
+        public SynthesizerWebAudioService(IVorbisEncoder vorbisEncoder, IMp3Encoder mp3Encoder, ISpeechSynthesizer speechSynthesizerFactory)
         {
-            SpeechSynthesizerFactory ??= new SpeechSynthesizerFactory();
+            VorbisEncoder = vorbisEncoder
+                ?? throw new ArgumentNullException("Vorbis Encoder Required");
+            Mp3Encoder = mp3Encoder
+                ?? throw new ArgumentNullException("Mp3 Encoder Required");
+            SpeechSynthesizerFactory = speechSynthesizerFactory
+                ?? throw new ArgumentNullException("Speech Synthesizer Required");
+        }
+        
+        public SynthesizerWebAudioService(ISpeechSynthesizer speechSynthesizerFactory)
+        {
+            SpeechSynthesizerFactory = speechSynthesizerFactory ?? new WindowsSpeechSynthesizer();
             VorbisEncoder ??= new VorbisEncoder();
             Mp3Encoder ??= new Mp3Encoder();
         }
 
-        public enum AUDIO_FORMAT
-        {
-            WAV = 0,
-            MP3 = 2,
-            OGG = 4
-        }
-
-        public string[] GetVoiceNames() => SpeechSynthesizerFactory.Voices();
+        public Task<string[]> GetVoiceNamesAsync() => SpeechSynthesizerFactory.VoicesAsync();
 
         public async Task<MemoryStream> TextToSpeechAudioAsync(string text, TextToSpeechAudioOptions options = null)
         {
@@ -69,11 +84,13 @@ namespace SynthesizerAudio
                     await Mp3Encoder.EncodeAsync(speechSynthesizerStream, audioStream);
                     break;
                 case AUDIO_FORMAT.OGG:
-                    await VorbisEncoder.EncodeAsync(speechSynthesizerStream, audioStream);
+                    await VorbisEncoder.EncodeAsync(speechSynthesizerStream, audioStream, options);
                     break;
                 default:
-                    await SpeechSynthesizerFactory.CopyToAsync(speechSynthesizerStream, audioStream);
-                    break;
+
+                    // Already in a wav format so just return it
+                    speechSynthesizerStream.Position = 0;
+                    return speechSynthesizerStream;
             }
 
             // Set the position back to zero to start from the begining
@@ -92,20 +109,23 @@ namespace SynthesizerAudio
                 case "ogg":
                     format = AUDIO_FORMAT.OGG;
                     break;
+
                 case "mp3":
                     format = AUDIO_FORMAT.MP3;
                     break;
+
                 case "wav":
                     format = AUDIO_FORMAT.WAV;
                     break;
             }
             return await WebResponseAsync(text, new TextToSpeechAudioOptions { Format = format });
         }
+
         public async Task<SynthesizerWebAudioResponse> WebResponseAsync(string text, TextToSpeechAudioOptions options = null)
         {
             if (string.IsNullOrEmpty(text))
             {
-                throw new MissingParameters("text");
+                throw new ArgumentException(nameof(text));
             }
             var contentType = "audio/mp3";
             switch (options?.Format)
@@ -113,9 +133,11 @@ namespace SynthesizerAudio
                 case AUDIO_FORMAT.OGG:
                     contentType = "audio/ogg";
                     break;
+
                 case AUDIO_FORMAT.MP3:
                     contentType = "audio/mp3";
                     break;
+
                 case AUDIO_FORMAT.WAV:
                     contentType = "audio/wav";
                     break;
@@ -132,26 +154,11 @@ namespace SynthesizerAudio
                 ContentType = contentType;
                 ContentLength = contentLength;
             }
-
             public int StatusCode { get; }
             public MemoryStream AudioStream { get; }
             public string ContentType { get; }
             public long ContentLength { get; }
-
-            public byte[] ToArray() => AudioStream?.ToArray() ?? new byte[0];
-        }
-
-
-
-        public class MissingParameters : Exception
-        {
-            public MissingParameters(string parameter)
-            {
-                Parameter = parameter;
-            }
-            public override string Message => $"Missing parameter {Parameter} or is empty";
-
-            public string Parameter { get; }
+            public byte[] ToArray() => AudioStream?.ToArray() ?? Array.Empty<byte>();
         }
     }
 }
